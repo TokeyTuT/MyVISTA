@@ -1,0 +1,7 @@
+# VISTA 数据集论文复现
+
+原论文 [What Is That Talk About A Video-to-Text Summarization Dataset for Scientific Presentations](https://arxiv.org/abs/2502.08279)
+
+原仓库 [VISTA](https://github.com/dongqi-me/VISTA)
+
+数据集 [Dataset](https://huggingface.co/datasets/dongqi-me/VISTA)
