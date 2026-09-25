@@ -1,0 +1,136 @@
+# ==========================================
+# 1. 深度学习与 CV 数据集 (避免大文件/海量小图入库)
+# ==========================================
+data/
+datasets/
+raw_data/
+processed_data/
+*.h5
+*.hdf5
+*.tfrecord
+*.lmdb
+*.arrow
+*.parquet
+*.feather
+
+# 常见 CV 原始图像/标注归档与视频
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.mp4
+*.avi
+*.mkv
+*.mov
+
+# ==========================================
+# 2. 模型权重与 Checkpoints (PyTorch / TF / ONNX / 权重)
+# ==========================================
+checkpoints/
+weights/
+saved_models/
+pretrained/
+outputs/
+*.pt
+*.pth
+*.bin
+*.ckpt
+*.safetensors
+*.onnx
+*.engine
+*.tensorrt
+*.pkl
+*.pickle
+*.joblib
+*.pb
+*.tflite
+
+# ==========================================
+# 3. 实验日志、可视化与追踪工具 (TensorBoard, WandB, MLflow)
+# ==========================================
+logs/
+log/
+runs/
+events.out.tfevents.*
+wandb/
+.neptune/
+mlruns/
+lightning_logs/
+
+# ==========================================
+# 4. Python 缓存与构建文件
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ==========================================
+# 5. 虚拟环境 (Conda / venv)
+# ==========================================
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+conda-meta/
+
+# ==========================================
+# 6. Jupyter Notebook 运行时与检查点
+# ==========================================
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+*-checkpoint.ipynb
+
+# ==========================================
+# 7. IDE 配置与开发工具
+# ==========================================
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm / JetBrains
+.idea/
+
+# macOS / Windows 系统垃圾文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# ==========================================
+# 8. 敏感配置与密钥
+# ==========================================
+secrets.yaml
+config.local.yaml
+.env.local
+kaggle.json
+*.pem
+*.key
