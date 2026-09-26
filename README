@@ -5,3 +5,6 @@
 原仓库 [VISTA](https://github.com/dongqi-me/VISTA)
 
 数据集 [Dataset](https://huggingface.co/datasets/dongqi-me/VISTA)
+
+因为本机配置有限，并且主要目的是为了学习。在实际实现中，
+原文中最终采用的 mPLUG-Owl3-7B 在本项目中被换成了相同架构的 2B 模型
