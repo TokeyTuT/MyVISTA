@@ -2,6 +2,7 @@
 
 import torch
 from torch import nn
+from lora import configure_lora
 from transformers import AutoTokenizer, AutoModel
 
 from prompts import PG_PROMPT
@@ -21,7 +22,7 @@ class PlanGenerator(nn.Module):
         → _encode → model.generate → 返回生成的问题文本。
 
     注意：forward 只计算 loss；loss.backward() 和 optimizer.step()
-    需要在外部训练循环中执行。本类目前还没有配置 LoRA。
+    需要在外部训练循环中执行。本类使用 LoRA 和视觉投影层微调。
 
 
 
@@ -48,8 +49,8 @@ class PlanGenerator(nn.Module):
         self.processor = self.model.init_processor(self.tokenizer)
 
         # 冻结视觉编码器，不计算其参数梯度。
-        # 语言模型和视觉投影层仍可训练；是否更新取决于外部 optimizer。
-        self.model.vision_model.requires_grad_(False)
+        # 只训练语言模型中的 LoRA 参数和视觉投影层。
+        configure_lora(self.model)
 
     def _encode(self, video_frames, plan_text=None):
         """

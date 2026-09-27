@@ -2,6 +2,7 @@
 
 import torch
 from torch import nn
+from lora import configure_lora
 from transformers import AutoTokenizer, AutoModel
 
 from prompts import SG_PROMPT
@@ -30,7 +31,7 @@ class SummaryGenerator(nn.Module):
         ).to(self.device)
 
         self.processor = self.model.init_processor(self.tokenizer)
-        self.model.vision_model.requires_grad_(False)
+        configure_lora(self.model)
 
     def _encode(self, video_frames,plan_text,abstract=None):
         """

@@ -6,6 +6,7 @@ from data_utils import get_frames,load_vista_dataset
 from pathlib import Path
 from pg_model import PlanGenerator
 from sg_model import SummaryGenerator
+from lora import save_lora
 
 
 def train_pg(
@@ -23,6 +24,7 @@ def train_pg(
     optimizer = torch.optim.AdamW(
         (p for p in model.parameters() if p.requires_grad),
         lr=learning_rate,
+        foreach=False,
     )
 
     for epoch in range(epochs):
@@ -35,11 +37,18 @@ def train_pg(
                 num_frames
             )
 
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             outputs = model(frames,sample['plan'])
 
             loss = outputs.loss
+            if not torch.isfinite(loss):
+                raise RuntimeError("loss 非有限值，停止训练以避免保存损坏参数")
             loss.backward()
+            # 更新前检查并裁剪梯度；发现 NaN/Inf 时直接报错。
+            torch.nn.utils.clip_grad_norm_(
+                (p for p in model.parameters() if p.requires_grad),
+                max_norm=1.0, error_if_nonfinite=True,
+            )
 
             optimizer.step()
 
@@ -63,6 +72,7 @@ def train_sg(
     optimizer = torch.optim.AdamW(
         (p for p in model.parameters() if p.requires_grad),
         lr=learning_rate,
+        foreach=False,
     )
 
     for epoch in range(epochs):
@@ -75,11 +85,18 @@ def train_sg(
                 num_frames
             )
 
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             outputs = model(frames, sample['plan'],sample['abstract'])
 
             loss = outputs.loss
+            if not torch.isfinite(loss):
+                raise RuntimeError("loss 非有限值，停止训练以避免保存损坏参数")
             loss.backward()
+            # 更新前检查并裁剪梯度；发现 NaN/Inf 时直接报错。
+            torch.nn.utils.clip_grad_norm_(
+                (p for p in model.parameters() if p.requires_grad),
+                max_norm=1.0, error_if_nonfinite=True,
+            )
 
             optimizer.step()
 
@@ -127,7 +144,7 @@ def train(
     )
 
     # train_pg 返回后，其局部 optimizer 已不再保留
-    torch.save(pg.state_dict(), save_dir / "pg.pt")
+    save_lora(pg, save_dir / "pg_lora.pt")
     del pg
     gc.collect()
 
@@ -151,7 +168,7 @@ def train(
         data_root=data_root,
     )
 
-    torch.save(sg.state_dict(), save_dir / "sg.pt")
+    save_lora(sg, save_dir / "sg_lora.pt")
 
     print(f"训练完成，模型参数保存在: {save_dir}")
 
