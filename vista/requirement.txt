@@ -16,7 +16,7 @@ modelscope==1.40.1
 
 # 数据集、视频抽帧与图像处理
 datasets==5.0.1
-numpy==1.26.4
+numpy>=2.0.0
 Pillow==12.3.0
 opencv-python==5.0.0.93
 
