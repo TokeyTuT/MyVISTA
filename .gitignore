@@ -134,3 +134,5 @@ config.local.yaml
 kaggle.json
 *.pem
 *.key
+
+vista/original_model/
