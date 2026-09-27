@@ -1,0 +1,152 @@
+{
+  "practice_cvpr2025_r65VFu1sa2E": {
+    "id": "practice_cvpr2025_r65VFu1sa2E",
+    "abstract": "Diffusion models indirectly estimate the probability density over a data space, which can be used to study its structure. In this work, we show that geodesics can be computed in diffusion latent space, where the norm induced by the spatially-varying inner product is inversely proportional to the probability density. In this formulation, a path that traverses a high density (that is, probable) region of image latent space is shorter than the equivalent path through a low density region. We present algorithms for solving the associated initial and boundary value problems and show how to compute the probability density along the path and the geodesic distance between two points. Using these techniques, we analyze how closely video clips approximate geodesics in a pre-trained image diffusion space. Finally, we demonstrate how these techniques can be applied to training-free image sequence interpolation and extrapolation, given a pre-trained image diffusion model.",
+    "question_prompt": "Generate a coherent and contextually relevant question based on the provided context and target sentence, ensuring that the target sentence can be treated as an answer to the generated question.\nOutput only one question in plain text.Do not include Markdown formatting, labels, numbering, quotation marks, explanations, or answers.Context: {context}Target: {target}Question Sentence:",
+    "teacher_model": "deepseek-flash",
+    "thinking": "disabled",
+    "max_tokens": 512,
+    "reference_sentences": [
+      "Diffusion models indirectly estimate the probability density over a data space, which can be used to study its structure.",
+      "In this work, we show that geodesics can be computed in diffusion latent space, where the norm induced by the spatially-varying inner product is inversely proportional to the probability density.",
+      "In this formulation, a path that traverses a high density (that is, probable) region of image latent space is shorter than the equivalent path through a low density region.",
+      "We present algorithms for solving the associated initial and boundary value problems and show how to compute the probability density along the path and the geodesic distance between two points.",
+      "Using these techniques, we analyze how closely video clips approximate geodesics in a pre-trained image diffusion space.",
+      "Finally, we demonstrate how these techniques can be applied to training-free image sequence interpolation and extrapolation, given a pre-trained image diffusion model."
+    ],
+    "plan": [
+      "What can be used to study the structure of a data space by indirectly estimating its probability density?",
+      "How can geodesics be computed within diffusion latent space to study the structure of the probability density over a data space?",
+      "What relationship between path length and probability density exists in the diffusion latent space formulation?",
+      "What algorithms are presented for solving the initial and boundary value problems and for computing the probability density along the path and the geodesic distance between two points in diffusion latent space?",
+      "How can the techniques for computing geodesics in diffusion latent space be applied to video clips?",
+      "How can these techniques be applied to training-free image sequence interpolation and extrapolation given a pre-trained image diffusion model?"
+    ]
+  },
+  "practice_cvpr2025__a9q_O8yN4E": {
+    "id": "practice_cvpr2025__a9q_O8yN4E",
+    "abstract": "Foundation models have significantly reduced the need for task-specific training, while also enhancing generalizability. However, state-of-the-art 6D pose estimators either require further training with pose supervision or neglect advances obtainable from 3D foundation models. The latter is a missed opportunity, since these models are better equipped to predict 3D-consistent features, which are of significant utility for the pose estimation task. To address this gap, we propose Pos3R, a method for estimating the 6D pose of any object from a single RGB image, making extensive use of a 3D reconstruction foundation model and requiring no additional training. We identify template selection as a particular bottleneck for existing methods that is significantly alleviated by the use of a 3D model, which can more easily distinguish between template poses than a 2D model. Despite its simplicity, Pos3R achieves competitive performance on the Benchmark for 6D Object Pose Estimation (BOP), matching or surpassing existing refinement-free methods. Additionally, Pos3R integrates seamlessly with render-and-compare refinement techniques, demonstrating adaptability for high-precision applications.",
+    "question_prompt": "Generate a coherent and contextually relevant question based on the provided context and target sentence, ensuring that the target sentence can be treated as an answer to the generated question.\nOutput only one question in plain text.Do not include Markdown formatting, labels, numbering, quotation marks, explanations, or answers.Context: {context}Target: {target}Question Sentence:",
+    "teacher_model": "deepseek-flash",
+    "thinking": "disabled",
+    "max_tokens": 512,
+    "reference_sentences": [
+      "Foundation models have significantly reduced the need for task-specific training, while also enhancing generalizability.",
+      "However, state-of-the-art 6D pose estimators either require further training with pose supervision or neglect advances obtainable from 3D foundation models.",
+      "The latter is a missed opportunity, since these models are better equipped to predict 3D-consistent features, which are of significant utility for the pose estimation task.",
+      "To address this gap, we propose Pos3R, a method for estimating the 6D pose of any object from a single RGB image, making extensive use of a 3D reconstruction foundation model and requiring no additional training.",
+      "We identify template selection as a particular bottleneck for existing methods that is significantly alleviated by the use of a 3D model, which can more easily distinguish between template poses than a 2D model.",
+      "Despite its simplicity, Pos3R achieves competitive performance on the Benchmark for 6D Object Pose Estimation (BOP), matching or surpassing existing refinement-free methods.",
+      "Additionally, Pos3R integrates seamlessly with render-and-compare refinement techniques, demonstrating adaptability for high-precision applications."
+    ],
+    "plan": [
+      "What impact have foundation models had on the need for task-specific training and on generalizability?",
+      "What is the current state of 6D pose estimation despite the advances brought by foundation models?",
+      "What is the consequence of state-of-the-art 6D pose estimators neglecting advances obtainable from 3D foundation models?",
+      "How do you address the gap in 6D pose estimation methods that either require additional training with pose supervision or do not leverage 3D foundation models?",
+      "What bottleneck do the authors identify for existing methods, and how is it alleviated by using a 3D model?",
+      "What is the performance of Pos3R on the Benchmark for 6D Object Pose Estimation despite its simplicity?",
+      "How does Pos3R support high-precision applications through its integration with refinement techniques?"
+    ]
+  },
+  "practice_cvpr2025_ke3g0Fus9vI": {
+    "id": "practice_cvpr2025_ke3g0Fus9vI",
+    "abstract": "Can objects that are not visible in an image---but are in the vicinity of the camera---be detected? This study introduces the novel tasks of 2D, 2.5D and 3D unobserved object detection for predicting the location of nearby objects that are occluded or lie outside the image frame. We adapt several state-of-the-art pre-trained generative models to address this task, including 2D and 3D diffusion models and vision-language models, and show that they can be used to infer the presence of objects that are not directly observed. To benchmark this task, we propose a suite of metrics that capture different aspects of performance. Our empirical evaluation on indoor scenes from the RealEstate10k and NYU Depth v2 datasets demonstrate results that motivate the use of generative models for the unobserved object detection task.",
+    "question_prompt": "Generate a coherent and contextually relevant question based on the provided context and target sentence, ensuring that the target sentence can be treated as an answer to the generated question.\nOutput only one question in plain text.Do not include Markdown formatting, labels, numbering, quotation marks, explanations, or answers.Context: {context}Target: {target}Question Sentence:",
+    "teacher_model": "deepseek-flash",
+    "thinking": "disabled",
+    "max_tokens": 512,
+    "reference_sentences": [
+      "Can objects that are not visible in an image---but are in the vicinity of the camera---be detected?",
+      "This study introduces the novel tasks of 2D, 2.5D and 3D unobserved object detection for predicting the location of nearby objects that are occluded or lie outside the image frame.",
+      "We adapt several state-of-the-art pre-trained generative models to address this task, including 2D and 3D diffusion models and vision-language models, and show that they can be used to infer the presence of objects that are not directly observed.",
+      "To benchmark this task, we propose a suite of metrics that capture different aspects of performance.",
+      "Our empirical evaluation on indoor scenes from the RealEstate10k and NYU Depth v2 datasets demonstrate results that motivate the use of generative models for the unobserved object detection task."
+    ],
+    "plan": [
+      "Based on the given context and target sentence, can objects that are not visible in an image but are near the camera be detected?",
+      "Can objects that are not visible in an image but are in the vicinity of the camera be detected?",
+      "Can state-of-the-art pre-trained generative models be used to infer the presence of objects that are not directly observed?",
+      "What did the study propose to benchmark the task of unobserved object detection?",
+      "What results motivated the use of generative models for the unobserved object detection task?"
+    ]
+  },
+  "practice_cvpr2025_md6q-zAjmSU": {
+    "id": "practice_cvpr2025_md6q-zAjmSU",
+    "abstract": "Implicit Neural Representations (INRs) are a versatile and powerful tool for encoding various forms of data, including images, videos, sound, and 3D shapes. A critical factor in the success of INRs is the initialization of the network, which can significantly impact the convergence and accuracy of the learned model. Unfortunately, commonly used neural network initializations are not widely applicable for many activation functions, especially those used by INRs. In this paper, we improve upon previous initialization methods by deriving an initialization that has stable variance across layers, and applies to any activation function. We show that this generalizes many previous initialization methods, and has even better stability for well studied activations. We also show that our initialization leads to improved results with INR activation functions in multiple signal modalities. Our approach is particularly effective for Gaussian INRs, where we demonstrate that the theory of our initialization matches with task performance in multiple experiments, allowing us to achieve improvements in image, audio, and 3D surface reconstruction.",
+    "question_prompt": "Generate a coherent and contextually relevant question based on the provided context and target sentence, ensuring that the target sentence can be treated as an answer to the generated question.\nOutput only one question in plain text.Do not include Markdown formatting, labels, numbering, quotation marks, explanations, or answers.Context: {context}Target: {target}Question Sentence:",
+    "teacher_model": "deepseek-flash",
+    "thinking": "disabled",
+    "max_tokens": 512,
+    "reference_sentences": [
+      "Implicit Neural Representations (INRs) are a versatile and powerful tool for encoding various forms of data, including images, videos, sound, and 3D shapes.",
+      "A critical factor in the success of INRs is the initialization of the network, which can significantly impact the convergence and accuracy of the learned model.",
+      "Unfortunately, commonly used neural network initializations are not widely applicable for many activation functions, especially those used by INRs.",
+      "In this paper, we improve upon previous initialization methods by deriving an initialization that has stable variance across layers, and applies to any activation function.",
+      "We show that this generalizes many previous initialization methods, and has even better stability for well studied activations.",
+      "We also show that our initialization leads to improved results with INR activation functions in multiple signal modalities.",
+      "Our approach is particularly effective for Gaussian INRs, where we demonstrate that the theory of our initialization matches with task performance in multiple experiments, allowing us to achieve improvements in image, audio, and 3D surface reconstruction."
+    ],
+    "plan": [
+      "What type of neural network can be used to encode various forms of data such as images, videos, sound, and 3D shapes?",
+      "What is a critical factor in the success of Implicit Neural Representations that can significantly impact the convergence and accuracy of the learned model?",
+      "Why is the initialization of implicit neural representations (INRs) networks challenging when using many activation functions?",
+      "What does this paper propose to improve upon previous initialization methods for implicit neural representations?",
+      "What improvement does the proposed initialization method provide over previous initialization methods for implicit neural representations?",
+      "What impact does your stable-variance initialization have on results with INR activation functions across different signal modalities?",
+      "What are the practical benefits of the proposed initialization method for Gaussian implicit neural representations?"
+    ]
+  },
+  "practice_cvpr2025_oZcMMpyfU1s": {
+    "id": "practice_cvpr2025_oZcMMpyfU1s",
+    "abstract": "Neural Radiance Fields (NeRF) has demonstrated its superior capability to represent 3D geometry but require accurately precomputed camera poses during training. To mitigate this requirement, existing methods jointly optimize camera poses and NeRF often relying on good pose initialisation or depth priors. However, these approaches struggle in challenging scenarios, such as large rotations, as they map each camera to a world coordinate system. We propose a novel method that eliminates prior dependencies by modeling continuous camera motions as time-dependent angular velocity and velocity. Relative motions between cameras are learned first via velocity integration, while camera poses can be obtained by aggregating such relative motions up to a world coordinate system defined at a single time step within the video. Specifically, accurate continuous camera movements are learned through a time-dependent NeRF, which captures local scene geometry and motion by training from neighboring frames for each time step. The learned motions enable fine-tuning the NeRF to represent the full scene geometry. Experiments on Co3D and Scannet show our approach achieves superior camera pose and depth estimation and comparable novel-view synthesis performance compared to state-of-the-art methods.",
+    "question_prompt": "Generate a coherent and contextually relevant question based on the provided context and target sentence, ensuring that the target sentence can be treated as an answer to the generated question.\nOutput only one question in plain text.Do not include Markdown formatting, labels, numbering, quotation marks, explanations, or answers.Context: {context}Target: {target}Question Sentence:",
+    "teacher_model": "deepseek-flash",
+    "thinking": "disabled",
+    "max_tokens": 512,
+    "reference_sentences": [
+      "Neural Radiance Fields (NeRF) has demonstrated its superior capability to represent 3D geometry but require accurately precomputed camera poses during training.",
+      "To mitigate this requirement, existing methods jointly optimize camera poses and NeRF often relying on good pose initialisation or depth priors.",
+      "However, these approaches struggle in challenging scenarios, such as large rotations, as they map each camera to a world coordinate system.",
+      "We propose a novel method that eliminates prior dependencies by modeling continuous camera motions as time-dependent angular velocity and velocity.",
+      "Relative motions between cameras are learned first via velocity integration, while camera poses can be obtained by aggregating such relative motions up to a world coordinate system defined at a single time step within the video.",
+      "Specifically, accurate continuous camera movements are learned through a time-dependent NeRF, which captures local scene geometry and motion by training from neighboring frames for each time step.",
+      "The learned motions enable fine-tuning the NeRF to represent the full scene geometry.",
+      "Experiments on Co3D and Scannet show our approach achieves superior camera pose and depth estimation and comparable novel-view synthesis performance compared to state-of-the-art methods."
+    ],
+    "plan": [
+      "What does Neural Radiance Fields (NeRF) require during training despite its superior capability to represent 3D geometry?",
+      "How do existing methods mitigate the requirement for accurately precomputed camera poses in NeRF?",
+      "What limitation do existing methods that jointly optimize camera poses and NeRF face in challenging scenarios such as large rotations?",
+      "What novel method eliminates prior dependencies by modeling continuous camera motions as time-dependent angular velocity and velocity?",
+      "How does the proposed method eliminate prior dependencies when jointly optimizing camera poses and NeRF?",
+      "How are continuous camera movements learned to eliminate prior dependencies in the proposed method?",
+      "What enables fine-tuning the NeRF to represent the full scene geometry?",
+      "What do experiments on Co3D and Scannet show about the proposed approach?"
+    ]
+  },
+  "practice_cvpr2025_UgPjZmAMPjE": {
+    "id": "practice_cvpr2025_UgPjZmAMPjE",
+    "abstract": "The evolution of Large Vision-Language Models (LVLMs) has progressed from single-image understanding to multi-image reasoning. Despite this advancement, our findings indicate that LVLMs struggle to robustly utilize information across multiple images, with predictions significantly affected by the alteration of image positions. To further explore this issue, we introduce Position-wise Question Answering (PQA), a meticulously designed task to quantify reasoning capabilities at each position. Our analysis reveals a pronounced position bias in LVLMs: open-source models excel in reasoning with images positioned later but underperform with those in the middle or at the beginning, while proprietary models like GPT-4o show improved comprehension for images at the beginning and end but struggle with those in the middle. Motivated by these insights, we propose SoFt Attention (SoFA), a simple, training-free approach that mitigates this bias by employing linear interpolation between inter-image causal attention and bidirectional counterparts. Experimental results demonstrate that SoFA effectively reduces position bias and significantly enhances the reasoning performance of existing LVLMs.",
+    "question_prompt": "Generate a coherent and contextually relevant question based on the provided context and target sentence, ensuring that the target sentence can be treated as an answer to the generated question.\nOutput only one question in plain text.Do not include Markdown formatting, labels, numbering, quotation marks, explanations, or answers.Context: {context}Target: {target}Question Sentence:",
+    "teacher_model": "deepseek-flash",
+    "thinking": "disabled",
+    "max_tokens": 512,
+    "reference_sentences": [
+      "The evolution of Large Vision-Language Models (LVLMs) has progressed from single-image understanding to multi-image reasoning.",
+      "Despite this advancement, our findings indicate that LVLMs struggle to robustly utilize information across multiple images, with predictions significantly affected by the alteration of image positions.",
+      "To further explore this issue, we introduce Position-wise Question Answering (PQA), a meticulously designed task to quantify reasoning capabilities at each position.",
+      "Our analysis reveals a pronounced position bias in LVLMs: open-source models excel in reasoning with images positioned later but underperform with those in the middle or at the beginning, while proprietary models like GPT-4o show improved comprehension for images at the beginning and end but struggle with those in the middle.",
+      "Motivated by these insights, we propose SoFt Attention (SoFA), a simple, training-free approach that mitigates this bias by employing linear interpolation between inter-image causal attention and bidirectional counterparts.",
+      "Experimental results demonstrate that SoFA effectively reduces position bias and significantly enhances the reasoning performance of existing LVLMs."
+    ],
+    "plan": [
+      "How has the evolution of Large Vision-Language Models progressed from single-image understanding to more complex reasoning?",
+      "How do Large Vision-Language Models perform when reasoning across multiple images?",
+      "How do you further explore the issue of LVLMs struggling to robustly utilize information across multiple images?",
+      "What did your analysis reveal about position bias in LVLMs?",
+      "What approach is proposed to mitigate the position bias in Large Vision-Language Models?",
+      "What does SoFA effectively reduce and significantly enhance in existing LVLMs according to the experimental results?"
+    ]
+  }
+}
