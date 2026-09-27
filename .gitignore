@@ -1,7 +1,7 @@
 # ==========================================
 # 1. 深度学习与 CV 数据集 (避免大文件/海量小图入库)
 # ==========================================
-
+data/
 datasets/
 raw_data/
 processed_data/
@@ -136,3 +136,11 @@ kaggle.json
 *.key
 
 vista/original_model/
+
+# 允许进入 vista/data，但仍忽略其中的其他内容
+!/vista/data/
+/vista/data/*
+
+# 仅允许提交 practice_data 及其内容
+!/vista/data/practice_data/
+!/vista/data/practice_data/**
