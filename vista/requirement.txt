@@ -1,0 +1,25 @@
+# VISTA 本机实验主要依赖
+# Python 3.10.21；版本来自当前 vista_env 环境。
+# 此文件记录实验环境，不代表已完成训练稳定性或全新环境安装验证。
+# 安装：python -m pip install -r requirement.txt
+
+# 模型训练与 Owl3 加载
+torch==2.13.0
+torchvision==0.28.0
+transformers==4.45.2
+accelerate==1.15.0
+safetensors==0.8.0
+einops==0.8.2
+icecream==2.2.0
+huggingface-hub==0.36.2
+modelscope==1.40.1
+
+# 数据集、视频抽帧与图像处理
+datasets==5.0.1
+numpy==1.26.4
+Pillow==12.3.0
+opencv-python==5.0.0.93
+
+# 摘要分句与 DeepSeek 教师 API（使用 OpenAI 兼容客户端）
+pysbd==0.3.4
+openai==3.19.2
