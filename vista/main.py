@@ -2,6 +2,7 @@ from pathlib import Path
 
 import torch
 from train import train
+from model_download import ensure_model_downloaded
 
 
 def main():
@@ -11,6 +12,8 @@ def main():
     MODEL_DIR = BASE_DIR / "original_model"
     SAVE_DIR = BASE_DIR / "checkpoints"
     SAVE_DIR.mkdir(parents=True, exist_ok=True)
+
+    MODEL_DIR = ensure_model_downloaded(MODEL_DIR, source="auto")
 
     device = torch.device(
         "cuda" if torch.cuda.is_available()
