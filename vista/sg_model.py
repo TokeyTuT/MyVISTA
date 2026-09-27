@@ -12,9 +12,8 @@ class SummaryGenerator(nn.Module):
     摘要生成阶段，输入为 ((video,teacher_plan),abstract)
     """
 
-    def __init__(self, model_dir, num_frames, device,**kwargs):
+    def __init__(self, model_dir, device,**kwargs):
         super().__init__(**kwargs)
-        self.num_frames = num_frames
         self.device = torch.device(device)
 
         self.tokenizer = AutoTokenizer.from_pretrained(

@@ -29,9 +29,8 @@ class PlanGenerator(nn.Module):
     见当前目录 Note/Owl3输入处理与 PG 训练原理.md
     """
 
-    def __init__(self, model_dir, num_frames, device):
+    def __init__(self, model_dir, device):
         super().__init__()
-        self.num_frames = num_frames
         self.device = torch.device(device)
 
         self.tokenizer = AutoTokenizer.from_pretrained(
