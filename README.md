@@ -24,3 +24,9 @@
 实验环境中使用的 Python 版本为 3.10 
 依赖文件在：`./vista/requirement.txt` 
 > 安装依赖：`pip install -r requirements.txt`
+
+## LoRA 微调
+
+为降低 Colab 上的训练显存占用，本复现改用 LoRA，而非更新整个语言模型。
+这属于本项目的实验调整，不能将其结果直接等同于原论文设置下的结果。
+本部分 的实现均由 Codex 生成
