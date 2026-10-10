@@ -135,7 +135,7 @@ kaggle.json
 *.pem
 *.key
 
-vista/original_model/
+vista_v1/original_model/
 
 # 允许进入 vista/data，但仍忽略其中的其他内容
 !/vista/data/
