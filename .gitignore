@@ -144,3 +144,5 @@ vista_v1/original_model/
 # 仅允许提交 practice_data 及其内容
 !/vista/data/practice_data/
 !/vista/data/practice_data/**
+
+vista_v2/results
