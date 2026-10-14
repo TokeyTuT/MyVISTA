@@ -1,3 +1,6 @@
+from sqlite3 import TimestampFromTicks
+from typing import final
+
 import numpy as np
 import cv2
 import math
@@ -11,18 +14,22 @@ def uniform_sample(
         path,
         num_frames = 32,
 ):
-    """均匀采样"""
+    """均匀采样，返回 (PIL 图像列表, 秒数时间戳列表)，一一对应。"""
     if num_frames < 1:
         ValueError("num_frames 必须大于 0！")
 
-    cap = cv2.VideoCapture(path)
+    cap = cv2.VideoCapture(str(path))
 
     if not cap.isOpened():
         raise FileNotFoundError(path)
 
 
     frames = []
+    timestamps = []
     try:
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        if not np.isfinite(fps) or fps <= 0:
+            raise ValueError("无法获取有效帧率，不能计算时间戳")
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         if total_frames < num_frames:
             print("视频没有有效帧")
@@ -39,12 +46,13 @@ def uniform_sample(
                 raise IOError(f'Cannot read frame {index} in  {path}')
 
             frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            timestamps.append(float(index) / fps)
 
 
     finally:
         cap.release()
 
-    return [Image.fromarray(frame) for frame in frames]
+    return [Image.fromarray(frame) for frame in frames], timestamps
 
 # 随机采样
 def random_sample(
@@ -52,15 +60,19 @@ def random_sample(
     num_frames = 32,
     random_seed = None
 ):
-    """随机采样"""
+    """随机采样，返回 (PIL 图像列表, 秒数时间戳列表)，保留抽取顺序。"""
     if num_frames < 1:
         ValueError("num_frames 必须大于 0！")
-    cap = cv2.VideoCapture(path)
+    cap = cv2.VideoCapture(str(path))
     if not cap.isOpened():
         raise FileNotFoundError(path)
 
     frames = []
+    timestamps = []
     try:
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        if not np.isfinite(fps) or fps <= 0:
+            raise ValueError("无法获取有效帧率，不能计算时间戳")
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         if total_frames < num_frames:
             print("视频帧数小于采样帧数，结果一定会提取重复帧数!")
@@ -79,11 +91,12 @@ def random_sample(
             if not success:
                 raise IOError(f'Cannot read frame {index} in  {path}')
             frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            timestamps.append(float(index) / fps)
 
     finally:
         cap.release()
 
-    return [Image.fromarray(frame) for frame in frames]
+    return [Image.fromarray(frame) for frame in frames], timestamps
 
 
 # 按照图片变化采样
@@ -250,6 +263,7 @@ def scene_sample(
     min_scene_seconds=3.0,
 ):
     """
+    返回: (PIL 图像列表, 秒数时间戳列表)，时间戳为候选采样位置。
     path: 视频路径
     num_frames: 目标帧数；候选不足时返回全部候选
     threshold: 相邻候选帧的画面变化阈值
@@ -285,11 +299,15 @@ def scene_sample(
 
     indices = select_from_segments(final_boundaries, counts)
 
-    final_frames = [frames[i] for i in indices]
+    final_frames = []
+    final_timestamps = []
+    for i in indices:
+        final_frames.append(frames[i])
+        final_timestamps.append(timestamps[i])
 
     # visualize_frames(final_frames)
 
-    return [Image.fromarray(frame) for frame in final_frames]
+    return [Image.fromarray(frame) for frame in final_frames],final_timestamps
 
 
 

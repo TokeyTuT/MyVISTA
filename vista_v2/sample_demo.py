@@ -40,13 +40,13 @@ def demo():
 
     num_frames = 8
 
-    uniform_frames = uniform_sample(VIDEO_PATH,num_frames)
+    uniform_frames, uniform_timestamps = uniform_sample(VIDEO_PATH,num_frames)
     visualize_frames(uniform_frames,'均匀采样')
 
-    random_frames = random_sample(VIDEO_PATH,num_frames)
+    random_frames, random_timestamps = random_sample(VIDEO_PATH,num_frames)
     visualize_frames(random_frames,'随机采样')
 
-    scene_frames = scene_sample(VIDEO_PATH,num_frames)
+    scene_frames, scene_timestamps = scene_sample(VIDEO_PATH,num_frames)
     visualize_frames(scene_frames,'按照图片变化程度采样')
 
 
