@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import math
 
-from videoPreprocessing import random_sample,uniform_sample,scene_sample
+from sampler import random_sample,uniform_sample,scene_sample
 from pathlib import Path
 
 plt.rcParams["font.sans-serif"] = ["SimHei", "Arial Unicode MS", "Microsoft YaHei"]
