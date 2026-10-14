@@ -1,5 +1,4 @@
 from pandas import Timestamp
-import torch 
 from pathlib import Path
 from datasets import load_dataset
 from preprocessingImage import image_to_data_url
@@ -13,12 +12,10 @@ def reasoning(
         sampler:VideoSampler,
         model,
         client,
-        device,
         max_tokens=1024
         ):
 
     data_root = Path(data_root)
-    device = torch.device(device)
 
     dataset = load_dataset(
             "json",
