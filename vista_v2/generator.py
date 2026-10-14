@@ -1,5 +1,4 @@
-import base64
-from io import BytesIO
+import math
 from Prompt import get_plan_generation_prompt,get_summary_generation_prompt
 
 def call_vlm(
@@ -7,7 +6,8 @@ def call_vlm(
         model,
         client,
         prompt,
-        max_tokens=1024
+        max_tokens=1024,
+        *, timestamps=None,
 ):
     """
     调用视觉大模型
@@ -16,11 +16,24 @@ def call_vlm(
     if not image_urls:
         raise ValueError("至少需要一张图片")
 
+    # 时间戳单位为秒，与图片逐一对应；未传时兼容原来的调用。
+    if timestamps is not None:
+        timestamps = [float(t) for t in timestamps]
+        if len(timestamps) != len(image_urls):
+            raise ValueError("timestamps 与 image_urls 数量必须一致")
+        if any(not math.isfinite(t) or t < 0 for t in timestamps):
+            raise ValueError("时间戳必须是非负有限数")
+        if any(b <= a for a, b in zip(timestamps, timestamps[1:])):
+            raise ValueError("时间戳必须严格递增，图片也应按相同顺序排列")
+
     content = [{"type": "text", "text": prompt}]
 
     for i, url in enumerate(image_urls):
+        label = f"Frame {i + 1}:"
+        if timestamps is not None:
+            label = f"Frame {i + 1} (approximately {timestamps[i]:.3f} seconds from video start):"
         content.extend([
-            {"type": "text", "text": f"Frame {i + 1}:"},
+            {"type": "text", "text": label},
             {"type": "image_url", "image_url": {"url": url}},
         ])
 
@@ -54,7 +67,8 @@ def generate_plan(
         image_urls,
         model,
         client,
-        max_tokens=1024
+        max_tokens=1024,
+        *, timestamps=None,
         ):
 
     """
@@ -65,7 +79,8 @@ def generate_plan(
         model,
         client,
         get_plan_generation_prompt(),
-        max_tokens
+        max_tokens,
+        timestamps=timestamps,
     )
 
 
@@ -75,6 +90,7 @@ def generate_summary(
         model,
         client,
         max_tokens=1024,
+        *, timestamps=None,
         ):
 
     """
@@ -87,7 +103,8 @@ def generate_summary(
         model,
         client,
         get_summary_generation_prompt(plan),
-        max_tokens
+        max_tokens,
+        timestamps=timestamps,
     )
 
 

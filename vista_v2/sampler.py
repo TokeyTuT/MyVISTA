@@ -1,12 +1,7 @@
-from sqlite3 import TimestampFromTicks
-from typing import final
-
 import numpy as np
 import cv2
-import math
 
 from PIL import Image
-from pathlib import Path
 
 
 # 均匀采样
@@ -15,8 +10,8 @@ def uniform_sample(
         num_frames = 32,
 ):
     """均匀采样，返回 (PIL 图像列表, 秒数时间戳列表)，一一对应。"""
-    if num_frames < 1:
-        ValueError("num_frames 必须大于 0！")
+    if not isinstance(num_frames, (int, np.integer)) or num_frames <= 0:
+        raise ValueError("num_frames 必须是正整数")
 
     cap = cv2.VideoCapture(str(path))
 
@@ -31,8 +26,8 @@ def uniform_sample(
         if not np.isfinite(fps) or fps <= 0:
             raise ValueError("无法获取有效帧率，不能计算时间戳")
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        if total_frames < num_frames:
-            print("视频没有有效帧")
+        if total_frames <= 0:
+            raise ValueError("视频没有有效帧")
 
         frames_indices = np.linspace(
             0, total_frames - 1, min(total_frames,num_frames), dtype=int
@@ -60,9 +55,9 @@ def random_sample(
     num_frames = 32,
     random_seed = None
 ):
-    """随机采样，返回 (PIL 图像列表, 秒数时间戳列表)，保留抽取顺序。"""
-    if num_frames < 1:
-        ValueError("num_frames 必须大于 0！")
+    """随机采样，返回 (PIL 图像列表, 秒数时间戳列表)，按时间排序且不重复；候选不足时返回全部帧。"""
+    if not isinstance(num_frames, (int, np.integer)) or num_frames <= 0:
+        raise ValueError("num_frames 必须是正整数")
     cap = cv2.VideoCapture(str(path))
     if not cap.isOpened():
         raise FileNotFoundError(path)
@@ -74,15 +69,15 @@ def random_sample(
         if not np.isfinite(fps) or fps <= 0:
             raise ValueError("无法获取有效帧率，不能计算时间戳")
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        if total_frames < num_frames:
-            print("视频帧数小于采样帧数，结果一定会提取重复帧数!")
+        if total_frames <= 0:
+            raise ValueError("视频没有有效帧")
 
-        if random_seed is not None:
-            np.random.seed(random_seed)
-
-        frames_indices = np.random.randint(
-            0,total_frames - 1, num_frames,dtype=int
-        )
+        rng = np.random.default_rng(random_seed)
+        frames_indices = np.sort(rng.choice(
+            total_frames,
+            size=min(num_frames, total_frames),
+            replace=False,
+        ))
 
         for index in frames_indices:
             cap.set(cv2.CAP_PROP_POS_FRAMES, int(index))
@@ -103,7 +98,7 @@ def random_sample(
 
 def read_candidates(video_path, interval=1.0):
     """每隔 interval 秒读取一帧，返回时间戳和 RGB 图像。"""
-    if interval <= 0:
+    if not np.isfinite(interval) or interval <= 0:
         raise ValueError("interval 必须大于 0")
 
     cap = cv2.VideoCapture(str(video_path))
@@ -118,7 +113,7 @@ def read_candidates(video_path, interval=1.0):
         fps = cap.get(cv2.CAP_PROP_FPS)
         total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
-        if fps <= 0 or total_frames <= 0:
+        if not np.isfinite(fps) or not np.isfinite(total_frames) or fps <= 0 or total_frames <= 0:
             raise ValueError("无法获取有效的视频时长")
 
         duration = total_frames / fps
