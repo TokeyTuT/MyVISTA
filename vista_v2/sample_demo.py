@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import math
 
-from sampler import VideoSampler
+from sampler import UniformSampler, RandomSampler, SceneSampler, read_candidates
 from pathlib import Path
 
 plt.rcParams["font.sans-serif"] = ["SimHei", "Arial Unicode MS", "Microsoft YaHei"]
@@ -39,15 +39,18 @@ def visualize_frames(frames,title=None):
 def demo():
 
     num_frames = 8
-    sampler = VideoSampler()
+    timestamps, frames = read_candidates(VIDEO_PATH, interval=1.0)
+    uniform_sampler = UniformSampler(num_frames=num_frames)
+    random_sampler = RandomSampler(num_frames=num_frames, random_seed=42)
+    scene_sampler = SceneSampler(num_frames=num_frames, threshold=0.08)
 
-    uniform_frames, uniform_timestamps = sampler(VIDEO_PATH, num_frames, method="uniform")
+    uniform_frames, uniform_timestamps = uniform_sampler.sample(frames, timestamps)
     visualize_frames(uniform_frames,'均匀采样')
 
-    random_frames, random_timestamps = sampler(VIDEO_PATH, num_frames, method="random")
+    random_frames, random_timestamps = random_sampler.sample(frames, timestamps)
     visualize_frames(random_frames,'随机采样')
 
-    scene_frames, scene_timestamps = sampler(VIDEO_PATH, num_frames, method="scene")
+    scene_frames, scene_timestamps = scene_sampler.sample(frames, timestamps)
     visualize_frames(scene_frames,'按照图片变化程度采样')
 
 

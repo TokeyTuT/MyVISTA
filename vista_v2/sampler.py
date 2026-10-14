@@ -1,191 +1,75 @@
-import numpy as np
-import cv2
+from abc import ABC, abstractmethod
 
+import cv2
+import numpy as np
 from PIL import Image
 
 
-class VideoSampler:
-    """统一的视频采样入口，返回 (PIL 图像列表, 秒数时间戳列表)。
+class VideoSampler(ABC):
+    """仅负责选择已有帧，返回 (PIL 图片列表, 秒数时间戳列表)。"""
 
-    示例：
-        sampler = VideoSampler("scene", threshold=0.08)
-        frames, timestamps = sampler(path, num_frames=16)
-
-    自定义方法须接受 (path, num_frames, **kwargs)，并返回相同格式。
-    图片和时间戳应一一对应、按时间递增，候选不足时可少于 num_frames。
-    """
-
-    def __init__(self, method="uniform", **kwargs):
-        self._methods = {
-            "uniform": self.uniform_sample,
-            "random": self.random_sample,
-            "scene": self.scene_sample,
-        }
-        self._validate_method(method)
-        self.method = method
-        self.options = dict(kwargs)
-
-    def _validate_method(self, method):
-        if method not in self._methods:
-            raise ValueError(
-                f"未知采样方法：{method}，可用方法：{', '.join(self._methods)}"
-            )
-
-    def register(self, name, function):
-        """为当前实例注册新方法；不覆盖已有方法。"""
-        if not isinstance(name, str) or not name.strip():
-            raise ValueError("方法名称必须是非空字符串")
-        if name in self._methods:
-            raise ValueError(f"采样方法已存在：{name}")
-        if not callable(function):
-            raise TypeError("采样方法必须可调用")
-        self._methods[name] = function
-
-    def sample(self, path, num_frames=32, *, method=None, **kwargs):
-        """调用时可覆盖默认参数；切换方法时不继承原方法的专用参数。"""
-        selected = self.method if method is None else method
-        self._validate_method(selected)
-        options = self.options.copy() if selected == self.method else {}
-        options.update(kwargs)
-        return self._methods[selected](path, num_frames=num_frames, **options)
-
-    def __call__(self, path, num_frames=32, **kwargs):
-        return self.sample(path, num_frames=num_frames, **kwargs)
-
-    @staticmethod
-    def uniform_sample(
-            path,
-            num_frames = 32,
-    ):
-        """均匀采样，返回 (PIL 图像列表, 秒数时间戳列表)，一一对应。"""
-        if not isinstance(num_frames, (int, np.integer)) or num_frames <= 0:
+    def __init__(self, num_frames=32):
+        if isinstance(num_frames, bool) or not isinstance(num_frames, (int, np.integer)) or num_frames <= 0:
             raise ValueError("num_frames 必须是正整数")
+        self.num_frames = int(num_frames)
 
-        cap = cv2.VideoCapture(str(path))
-
-        if not cap.isOpened():
-            raise FileNotFoundError(path)
-
-
-        frames = []
-        timestamps = []
-        try:
-            fps = cap.get(cv2.CAP_PROP_FPS)
-            if not np.isfinite(fps) or fps <= 0:
-                raise ValueError("无法获取有效帧率，不能计算时间戳")
-            total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            if total_frames <= 0:
-                raise ValueError("视频没有有效帧")
-
-            frames_indices = np.linspace(
-                0, total_frames - 1, min(total_frames,num_frames), dtype=int
-            )
-
-            for index in frames_indices:
-                cap.set(cv2.CAP_PROP_POS_FRAMES, int(index))
-
-                success, frame = cap.read()
-                if not success:
-                    raise IOError(f'Cannot read frame {index} in  {path}')
-
-                frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-                timestamps.append(float(index) / fps)
+    @abstractmethod
+    def sample(self, frames, timestamps):
+        """输入按时间排列的 RGB 数组或 PIL 图片及其秒数时间戳。"""
+        raise NotImplementedError
 
 
-        finally:
-            cap.release()
-
-        return [Image.fromarray(frame) for frame in frames], timestamps
-
-    @staticmethod
-    def random_sample(
-        path,
-        num_frames = 32,
-        random_seed = None
-    ):
-        """随机采样，返回 (PIL 图像列表, 秒数时间戳列表)，按时间排序且不重复；候选不足时返回全部帧。"""
-        if not isinstance(num_frames, (int, np.integer)) or num_frames <= 0:
-            raise ValueError("num_frames 必须是正整数")
-        cap = cv2.VideoCapture(str(path))
-        if not cap.isOpened():
-            raise FileNotFoundError(path)
-
-        frames = []
-        timestamps = []
-        try:
-            fps = cap.get(cv2.CAP_PROP_FPS)
-            if not np.isfinite(fps) or fps <= 0:
-                raise ValueError("无法获取有效帧率，不能计算时间戳")
-            total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            if total_frames <= 0:
-                raise ValueError("视频没有有效帧")
-
-            rng = np.random.default_rng(random_seed)
-            frames_indices = np.sort(rng.choice(
-                total_frames,
-                size=min(num_frames, total_frames),
-                replace=False,
-            ))
-
-            for index in frames_indices:
-                cap.set(cv2.CAP_PROP_POS_FRAMES, int(index))
-
-                success, frame = cap.read()
-                if not success:
-                    raise IOError(f'Cannot read frame {index} in  {path}')
-                frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-                timestamps.append(float(index) / fps)
-
-        finally:
-            cap.release()
-
-        return [Image.fromarray(frame) for frame in frames], timestamps
-
-    @classmethod
-    def read_candidates(cls, video_path, interval=1.0):
-        """每隔 interval 秒读取一帧，返回时间戳和 RGB 图像。"""
-        if not np.isfinite(interval) or interval <= 0:
-            raise ValueError("interval 必须大于 0")
-
-        cap = cv2.VideoCapture(str(video_path))
-
-        if not cap.isOpened():
-            raise IOError(f"无法打开视频：{video_path}")
-
-        timestamps = []
-        frames = []
-
-        try:
-            fps = cap.get(cv2.CAP_PROP_FPS)
-            total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
-
-            if not np.isfinite(fps) or not np.isfinite(total_frames) or fps <= 0 or total_frames <= 0:
-                raise ValueError("无法获取有效的视频时长")
-
-            duration = total_frames / fps
-
-            for t in np.arange(0, duration, interval):
-                cap.set(cv2.CAP_PROP_POS_MSEC, float(t * 1000))
-                success, frame = cap.read()
-
-                if not success:
-                    continue
-
-                timestamps.append(float(t))
-                frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-
-        finally:
-            cap.release()
-
-        if not frames:
-            raise ValueError("未读取到有效帧")
+class UniformSampler(VideoSampler):
+    def sample(self, frames, timestamps):
+        timestamps = _validate_candidates(frames, timestamps)
+        indices = np.linspace(
+            0, len(frames) - 1, min(len(frames), self.num_frames), dtype=int
+        )
+        return _select(frames, timestamps, indices)
 
 
-        # visualize_frames(frames) # debug
-        return np.array(timestamps), frames
+class RandomSampler(VideoSampler):
+    def __init__(self, num_frames=32, random_seed=None):
+        super().__init__(num_frames)
+        self.random_seed = random_seed
 
-    @classmethod
-    def prepare_frame(cls, frame):
+    def sample(self, frames, timestamps):
+        timestamps = _validate_candidates(frames, timestamps)
+        rng = np.random.default_rng(self.random_seed)
+        indices = np.sort(rng.choice(
+            len(frames), size=min(len(frames), self.num_frames), replace=False
+        ))
+        return _select(frames, timestamps, indices)
+
+
+class SceneSampler(VideoSampler):
+    def __init__(self, num_frames=32, threshold=0.08,
+                 min_scene_seconds=3.0):
+        super().__init__(num_frames)
+        if not np.isfinite(threshold) or threshold < 0:
+            raise ValueError("threshold 必须为非负有限数")
+        if not np.isfinite(min_scene_seconds) or min_scene_seconds < 0:
+            raise ValueError("min_scene_seconds 必须为非负有限数")
+        self.threshold = threshold
+        self.min_scene_seconds = min_scene_seconds
+
+    def sample(self, frames, timestamps):
+        timestamps = _validate_candidates(frames, timestamps)
+        rgb_frames = [
+            np.asarray(frame.convert("RGB")) if isinstance(frame, Image.Image)
+            else frame for frame in frames
+        ]
+        changes = self._calculate_changes(rgb_frames)
+        boundaries = self._detect_boundaries(
+            timestamps, changes
+        )
+        boundaries, counts = self._allocate_frames(
+            timestamps, changes, boundaries
+        )
+        indices = self._select_from_segments(boundaries, counts)
+        return _select(frames, timestamps, indices)
+
+    def _prepare_frame(self, frame):
         small = cv2.resize(frame, (160, 90))
         gray = cv2.cvtColor(small, cv2.COLOR_RGB2GRAY)
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -193,9 +77,8 @@ class VideoSampler:
         # 转成浮点数，避免 uint8 相减溢出
         return blurred.astype(np.float32) / 255.0
 
-    @classmethod
-    def calculate_changes(cls, frames):
-        features = [cls.prepare_frame(frame) for frame in frames]
+    def _calculate_changes(self, frames):
+        features = [self._prepare_frame(frame) for frame in frames]
         changes = np.zeros(len(features))
 
         for i in range(1, len(features)):
@@ -203,38 +86,27 @@ class VideoSampler:
 
         return changes
 
-    @classmethod
-    def detect_boundaries(cls, timestamps, changes,
-                          threshold=0.08, min_scene_seconds=3.0):
-        """返回片段边界，包含起点 0 和终点 len(timestamps)。"""
+    def _detect_boundaries(self, timestamps, changes):
         boundaries = [0]
-
         for i in range(1, len(timestamps)):
             elapsed = timestamps[i] - timestamps[boundaries[-1]]
-
-            if changes[i] > threshold and elapsed >= min_scene_seconds:
+            if changes[i] > self.threshold and elapsed >= self.min_scene_seconds:
                 boundaries.append(i)
-
         boundaries.append(len(timestamps))
         return boundaries
 
-    @classmethod
-    def allocate_frames(cls, timestamps, changes, boundaries, k):
+    def _allocate_frames(self, timestamps, changes, boundaries):
         """返回调整后的边界和各片段的帧数配额。"""
-        if k <= 0:
-            raise ValueError("k 必须大于 0")
-
         n = len(timestamps)
-        if n == 0:
-            raise ValueError("候选帧不能为空")
-
         # 总候选不足时，返回全部，不重复帧
-        target = min(k, n)
+        target = min(self.num_frames, n)
         boundaries = list(boundaries)
 
-
+        # 情况一：片段过多，删除较弱的内部边界
         if len(boundaries) - 1 > target:
             internal = boundaries[1:-1]
+
+            # 差异降序；差异相同时，较早的边界优先
             strongest = sorted(
                 internal,
                 key=lambda i: (-float(changes[i]), i),
@@ -272,8 +144,7 @@ class VideoSampler:
 
         return boundaries, counts
 
-    @classmethod
-    def select_from_segments(cls, boundaries, counts):
+    def _select_from_segments(self, boundaries, counts):
         """按各段配额取候选帧索引，结果有序且不重复。"""
         selected = []
 
@@ -291,60 +162,66 @@ class VideoSampler:
 
         return np.array(selected, dtype=int)
 
-    @classmethod
-    def scene_sample(
-        cls,
-        path,
-        num_frames,
-        threshold=0.08,
-        interval=1.0,
-        min_scene_seconds=3.0,
-    ):
-        """
-        返回: (PIL 图像列表, 秒数时间戳列表)，时间戳为候选采样位置。
-        path: 视频路径
-        num_frames: 目标帧数；候选不足时返回全部候选
-        threshold: 相邻候选帧的画面变化阈值
-        interval: 候选帧的采样时间间隔，单位秒
-        min_scene_seconds: 检测分段时，相邻分段起点的最小间隔
-        """
-        if not isinstance(num_frames, (int, np.integer)) or num_frames <= 0:
-            raise ValueError("num_frames 必须是正整数")
 
-        # 按前面 read_candidates 的返回顺序
-        timestamps, frames = cls.read_candidates(path, interval)
+def read_candidates(video_path, interval=1.0):
+    """每隔 interval 秒读取一帧，返回时间戳和 RGB 图像。"""
+    if not np.isfinite(interval) or interval <= 0:
+        raise ValueError("interval 必须大于 0")
 
-        # 内部已经逐张进行缩放、灰度化等处理；
-        # 原始 RGB frames 不会被替换
-        changes = cls.calculate_changes(frames)
+    cap = cv2.VideoCapture(str(video_path))
 
-        timestamps = np.asarray(timestamps, dtype=float)
-        changes = np.asarray(changes, dtype=float)
+    if not cap.isOpened():
+        raise IOError(f"无法打开视频：{video_path}")
 
-        original_boundaries = cls.detect_boundaries(
-            timestamps,
-            changes,
-            threshold=threshold,
-            min_scene_seconds=min_scene_seconds,
-        )
+    timestamps = []
+    frames = []
 
-        final_boundaries, counts = cls.allocate_frames(
-            timestamps,
-            changes,
-            original_boundaries,
-            num_frames,
-        )
+    try:
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
-        indices = cls.select_from_segments(final_boundaries, counts)
+        if not np.isfinite(fps) or not np.isfinite(total_frames) or fps <= 0 or total_frames <= 0:
+            raise ValueError("无法获取有效的视频时长")
 
-        final_frames = []
-        final_timestamps = []
-        for i in indices:
-            final_frames.append(frames[i])
-            final_timestamps.append(timestamps[i])
+        duration = total_frames / fps
 
-        # visualize_frames(final_frames)
+        for t in np.arange(0, duration, interval):
+            cap.set(cv2.CAP_PROP_POS_MSEC, float(t * 1000))
+            success, frame = cap.read()
 
-        return [Image.fromarray(frame) for frame in final_frames],final_timestamps
+            if not success:
+                continue
+
+            timestamps.append(float(t))
+            frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+
+    finally:
+        cap.release()
+
+    if not frames:
+        raise ValueError("未读取到有效帧")
 
 
+    return np.array(timestamps), frames
+
+
+def _validate_candidates(frames, timestamps):
+    timestamps = np.asarray(timestamps, dtype=float)
+    if len(frames) == 0:
+        raise ValueError("候选帧不能为空")
+    if timestamps.ndim != 1 or len(frames) != len(timestamps):
+        raise ValueError("frames 与 timestamps 必须一一对应")
+    if not np.all(np.isfinite(timestamps)) or np.any(timestamps < 0):
+        raise ValueError("时间戳必须是非负有限数")
+    if np.any(np.diff(timestamps) <= 0):
+        raise ValueError("候选帧须按时间排列，时间戳必须严格递增")
+    return timestamps
+
+
+def _select(frames, timestamps, indices):
+    selected = [
+        frames[i].convert("RGB") if isinstance(frames[i], Image.Image)
+        else Image.fromarray(frames[i])
+        for i in indices
+    ]
+    return selected, timestamps[indices].tolist()
