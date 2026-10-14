@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from time import perf_counter
 from datasets import load_dataset
 from preprocessingImage import image_to_data_url
 from sampler import VideoSampler,read_candidates
@@ -44,27 +45,53 @@ def reasoning(
     # 独占创建，防止覆盖已有实验结果。
     with output_path.open("x", encoding="utf-8") as output_file:
         for step,data in enumerate(dataset):
+            print(f"正在推理第 {step + 1} 条", flush=True)
+            timings = {}
             abstract = data['abstract']
             if not isinstance(abstract, str) or not abstract.strip():
                 raise ValueError(f"第 {step + 1} 条样本的参考摘要为空")
             video_path = data_root / data['video_path']
 
+            started = perf_counter()
             timestamps,frames = read_candidates(video_path,intervals)
-            selected_frames,selected_timestamps = sampler.sample(frames,timestamps)
+            timings["read_candidates"] = perf_counter() - started
+            print(f"  读取 {len(frames)} 张候选帧：{timings['read_candidates']:.2f} 秒", flush=True)
 
+            started = perf_counter()
+            selected_frames,selected_timestamps = sampler.sample(frames,timestamps)
+            timings["sampling"] = perf_counter() - started
+            # PIL 选中帧已独立保存，释放未选中的原尺寸候选图。
+            del frames
+            print(f"  选出 {len(selected_frames)} 帧：{timings['sampling']:.2f} 秒", flush=True)
+
+            started = perf_counter()
             image_urls = [image_to_data_url(image) for image in selected_frames]
+            timings["image_encoding"] = perf_counter() - started
+            del selected_frames
+            print(f"  图片编码：{timings['image_encoding']:.2f} 秒；开始生成计划…", flush=True)
+
+            started = perf_counter()
             plan, plan_usage = generate_plan(
                 image_urls,model,client,max_tokens,timestamps=selected_timestamps
                 )
 
+            timings["plan_api"] = perf_counter() - started
+            print(f"  计划 API：{timings['plan_api']:.2f} 秒；开始生成摘要…", flush=True)
+
+            started = perf_counter()
             summary, summary_usage = generate_summary(
                 image_urls,plan,model,client,max_tokens,timestamps=selected_timestamps
             )
 
+            timings["summary_api"] = perf_counter() - started
+            print(f"  摘要 API：{timings['summary_api']:.2f} 秒", flush=True)
+            del image_urls
+
+            started = perf_counter()
             score = evaluate_rouge(summary,abstract)
+            timings["evaluation"] = perf_counter() - started
 
             print(
-                f"第 {step + 1} 条推理 "
                 f"R1: {score['rouge1']['f1']:.4f} | "
                 f"R2: {score['rouge2']['f1']:.4f} | "
                 f"RLsum: {score['rougeLsum']['f1']:.4f}"
@@ -82,6 +109,7 @@ def reasoning(
                 "summary": summary,
                 "abstract": abstract,
                 "rouge": score,
+                "timings_seconds": timings,
                 "usage": {"plan": plan_usage, "summary": summary_usage},
             }
             output_file.write(json.dumps(record, ensure_ascii=False) + "\n")

@@ -168,7 +168,10 @@ class SceneSampler(VideoSampler):
 
 
 def read_candidates(video_path, interval=1.0):
-    """每隔 interval 秒读取一帧，返回时间戳和 RGB 图像。"""
+    """顺序读取候选帧，返回秒数时间戳和 RGB 图像。
+
+    按固定帧率将 interval 换算成目标帧号；可变帧率视频的时间戳为近似值。
+    """
     if not np.isfinite(interval) or interval <= 0:
         raise ValueError("interval 必须大于 0")
 
@@ -187,17 +190,38 @@ def read_candidates(video_path, interval=1.0):
         if not np.isfinite(fps) or not np.isfinite(total_frames) or fps <= 0 or total_frames <= 0:
             raise ValueError("无法获取有效的视频时长")
 
+        total_frames = int(total_frames)
+        if total_frames <= 0:
+            raise ValueError("视频没有有效帧")
         duration = total_frames / fps
 
-        for t in np.arange(0, duration, interval):
-            cap.set(cv2.CAP_PROP_POS_MSEC, float(t * 1000))
-            success, frame = cap.read()
+        # 间隔小于一帧时，每帧最多选一次，避免产生大量重复目标。
+        if interval * fps <= 1:
+            target_indices = np.arange(total_frames)
+        else:
+            target_indices = np.unique(
+                np.rint(np.arange(0, duration, interval) * fps).astype(int)
+            )
+            target_indices = target_indices[target_indices < total_frames]
 
-            if not success:
+        target_position = 0
+        for frame_index in range(int(target_indices[-1]) + 1):
+            # 连续解码，避免每个候选时刻都重新定位关键帧。
+            if not cap.grab():
+                raise IOError(f"Cannot decode frame {frame_index} in {video_path}")
+            if frame_index != target_indices[target_position]:
                 continue
 
-            timestamps.append(float(t))
+            success, frame = cap.retrieve()
+            if not success:
+                raise IOError(f"Cannot retrieve frame {frame_index} in {video_path}")
+
+            timestamps.append(float(frame_index) / fps)
             frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+
+            target_position += 1
+            if target_position == len(target_indices):
+                break
 
     finally:
         cap.release()
