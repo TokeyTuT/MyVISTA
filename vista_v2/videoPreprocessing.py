@@ -287,7 +287,7 @@ def scene_sample(
 
     final_frames = [frames[i] for i in indices]
 
-    visualize_frames(final_frames)
+    # visualize_frames(final_frames)
 
     return [Image.fromarray(frame) for frame in final_frames]
 
