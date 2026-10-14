@@ -18,6 +18,10 @@ class VideoSampler(ABC):
         """输入按时间排列的 RGB 数组或 PIL 图片及其秒数时间戳。"""
         raise NotImplementedError
 
+    @callable
+    def __call__(self, frames,timestamps):
+        return self.sample(frames,timestamps)
+
 
 class UniformSampler(VideoSampler):
     def sample(self, frames, timestamps):
