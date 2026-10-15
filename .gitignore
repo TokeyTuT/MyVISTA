@@ -15,6 +15,8 @@ processed_data/
 
 # 常见 CV 原始图像/标注归档与视频
 *.zip
+# 根目录的测试 mini 数据集允许提交
+!/data.zip
 *.tar
 *.tar.gz
 *.tgz
