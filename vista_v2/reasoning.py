@@ -123,7 +123,7 @@ def reasoning(
     r1 /= len(evaluations)
     r2 /= len(evaluations)
     rlsum /= len(evaluations)
-    print(f"推理完成，最终平均 F1（0～1）: \nR1:{r1:.4f}\tR2:{r2:.4f}\tRLSum{rlsum:.4f}")
+    print(f"推理完成，最终平均 F1（0～1）: \nR1:{r1:.4f}\tR2:{r2:.4f}\tRLSum:{rlsum:.4f}")
 
     print(f"逐条结果已保存到: {output_path}")
 
