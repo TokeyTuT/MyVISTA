@@ -27,7 +27,7 @@ def process_one_video(step, data, data_root, intervals, sampler, model, client,
     started = perf_counter()
     selected_frames,selected_timestamps = sampler.sample(frames,timestamps)
     timings["sampling"] = perf_counter() - started
-    # PIL 选中帧已独立保存，释放未选中的原尺寸候选图。
+    # PIL 选中帧已独立保存，释放未选中的原尺寸候选图
     del frames
     print(f"[{step + 1}] 选出 {len(selected_frames)} 帧：{timings['sampling']:.2f} 秒", flush=True)
 
@@ -108,7 +108,7 @@ def reasoning(
     tasks = iter(enumerate(dataset))
     print(f"共 {len(dataset)} 条视频，最多同时处理 {max_workers} 条", flush=True)
 
-    # 只有主线程负责评估和写文件，避免共享评估器及文件的并发访问。
+    # 只有主线程负责评估和写文件，避免共享评估器及文件的并发访问
     with output_path.open("x", encoding="utf-8") as output_file:
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             pending = {}
@@ -124,7 +124,7 @@ def reasoning(
                 )
                 pending[future] = (step, data)
 
-            # 只保留一个并发窗口，避免一次创建整个数据集的任务。
+            # 只保留一个并发窗口，避免一次创建整个数据集的任务
             for _ in range(min(max_workers, len(dataset))):
                 submit_next()
 
