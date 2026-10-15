@@ -25,6 +25,7 @@ def main():
 
     num_frames = 32
     interval = 1.5
+    max_workers = 3  # 同时处理的视频数；设为 1 即串行
 
     uniform_sampler = sampler.UniformSampler(num_frames)
     random_sampler = sampler.RandomSampler(num_frames,random_seed=RANDOM_SEED)
@@ -40,7 +41,8 @@ def main():
         # random_sampler,
         # random_sampler_one,
         model,
-        client
+        client,
+        max_workers=max_workers,
     )
 if __name__ == '__main__':
     main()
