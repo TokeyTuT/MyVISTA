@@ -1,0 +1,16 @@
+# Python 3.10.21；仅列出 v2 直接使用的第三方依赖
+# 视频读取、采样与图片编码
+numpy==1.26.4
+opencv-python==5.0.0.93
+Pillow==12.3.0
+
+# 数据集读取与模型 API 客户端
+datasets==5.0.1
+openai==3.19.2
+
+# 英文分句与 ROUGE 评估
+pysbd==0.3.4
+rouge-score==0.1.2
+
+# sample_demo.py 和 notebook 中的采样可视化
+matplotlib==3.10.9
