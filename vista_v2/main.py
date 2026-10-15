@@ -6,6 +6,9 @@ from openai import OpenAI
 from getpass import getpass
 from reasoning import reasoning
 
+
+RANDOM_SEED = 42
+
 def main():
 
     BASE_DIR = Path(__file__).resolve().parent
@@ -24,13 +27,18 @@ def main():
     interval = 1.5
 
     uniform_sampler = sampler.UniformSampler(num_frames)
-    random_sampler = sampler.RandomSampler(num_frames,random_seed=42)
+    random_sampler = sampler.RandomSampler(num_frames,random_seed=RANDOM_SEED)
     scene_sampler = sampler.SceneSampler(num_frames)
+
+    random_sampler_one = sampler.RandomSampler(1,random_seed=RANDOM_SEED)
 
     reasoning(
         DATA_ROOT,
         interval,
         scene_sampler,
+        # uniform_sampler,
+        # random_sampler,
+        # random_sampler_one,
         model,
         client
     )
